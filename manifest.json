@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "Desktop Pet - 小猫桌宠",
+    "version": "1.0",
+    "description": "让一只可爱的小猫在所有网页陪着你。",
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "cat_transparent.png",
+                "*.webm",
+                "*.mp4"
+            ],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}
