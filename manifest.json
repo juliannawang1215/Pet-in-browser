@@ -15,6 +15,7 @@
             "resources": [
                 "cat_transparent.png",
                 "cat_static.png",
+                "cat_static_hd.png",
                 "*.webm",
                 "*.mp4"
             ],

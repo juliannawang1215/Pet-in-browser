@@ -17,34 +17,43 @@
     const USE_WEBM = true; 
     const WEBM_FILENAME = 'you_video.webm'; 
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
-    const STATIC_IMAGE = 'cat_static.png'; // 静止图
+    const STATIC_IMAGE = 'cat_static_hd.png'; // 高清静止图
 
-    let petElement;
-    let isAnimating = false; // 当前是否在播放动画
+    let staticImgElement;
+    let animatedVideoElement;
+    let isAnimating = false;
+
+    // 创建静止的高清图片元素
+    staticImgElement = document.createElement('img');
+    staticImgElement.src = chrome.runtime.getURL(STATIC_IMAGE);
+    staticImgElement.id = 'floating-pet-static';
+    staticImgElement.style.display = 'block'; // 默认显示静止图
+    petContainer.appendChild(staticImgElement);
 
     if (USE_WEBM) {
-        // 创建 Video 视频元素
-        petElement = document.createElement('video');
-        petElement.src = chrome.runtime.getURL(WEBM_FILENAME);
-        petElement.loop = false; // 不循环，播放完自动停
-        petElement.muted = true; // 浏览器策略：静音才能自动播放
-        petElement.playsInline = true;
+        // 创建 Video 视频元素 (隐藏)
+        animatedVideoElement = document.createElement('video');
+        animatedVideoElement.src = chrome.runtime.getURL(WEBM_FILENAME);
+        animatedVideoElement.loop = false;
+        animatedVideoElement.muted = true;
+        animatedVideoElement.playsInline = true;
+        animatedVideoElement.id = 'floating-pet-animated';
+        animatedVideoElement.style.display = 'none'; // 默认隐藏
         
-        // 监听播放结束事件，自动重置到静止状态
-        petElement.addEventListener('ended', () => {
-            petElement.currentTime = 0;
-            petElement.pause();
+        animatedVideoElement.addEventListener('ended', () => {
+            animatedVideoElement.style.display = 'none';
+            staticImgElement.style.display = 'block';
+            animatedVideoElement.currentTime = 0;
             isAnimating = false;
         });
+        
+        petContainer.appendChild(animatedVideoElement);
     } else {
-        // 创建 Img 图片元素 (默认显示静止图)
-        petElement = document.createElement('img');
-        petElement.src = chrome.runtime.getURL(STATIC_IMAGE);
+        // ... (keep fallback if USE_WEBM is false, we can just use the img element)
+        // Since we are now using webm as requested, simplify.
+        staticImgElement.id = 'floating-pet-media'; 
     }
 
-    petElement.id = 'floating-pet-media';
-    
-    petContainer.appendChild(petElement);
     document.body.appendChild(petContainer);
 
     // 注入 CSS 样式
@@ -67,11 +76,13 @@
             filter: drop-shadow(0 20px 25px rgba(0,0,0,0.3)) !important;
         }
 
+        #floating-pet-static,
+        #floating-pet-animated,
         #floating-pet-media {
             width: 100% !important;
             height: auto !important;
             pointer-events: none !important; /* 避免挡住拖拽事件 */
-            display: block !important;
+            display: block; /* 被行内样式覆盖 */
             background: transparent !important;
         }
     `;
@@ -103,19 +114,19 @@
         isAnimating = true;
         
         if (USE_WEBM) {
-            petElement.currentTime = 0; // 重置到第一帧
-            petElement.play();
+            staticImgElement.style.display = 'none';
+            animatedVideoElement.style.display = 'block';
+            animatedVideoElement.currentTime = 0;
+            animatedVideoElement.play();
         } else {
             let targetSrc = chrome.runtime.getURL(ANIMATED_IMAGE);
-            // APNG cache bypass to force animation restart
             targetSrc += "?t=" + Date.now();
-            petElement.src = targetSrc;
+            staticImgElement.src = targetSrc;
             
-            // 动画长度大约是 5 秒 (121帧 / 24fps)
             clearTimeout(animationTimer);
             animationTimer = setTimeout(() => {
                 isAnimating = false;
-                petElement.src = chrome.runtime.getURL(STATIC_IMAGE);
+                staticImgElement.src = chrome.runtime.getURL(STATIC_IMAGE);
             }, 5000);
         }
         
@@ -127,7 +138,7 @@
     }
 
     function dragStart(e) {
-        if (e.target === petContainer || e.target === petElement) {
+        if (e.target === petContainer || e.target === staticImgElement || e.target === animatedVideoElement) {
             initialX = e.clientX - xOffset;
             initialY = e.clientY - yOffset;
             clickStartX = e.clientX;
