@@ -16,22 +16,24 @@
     // ==========================================
     const USE_WEBM = false; 
     const WEBM_FILENAME = 'your_video.webm'; 
-    const IMAGE_FILENAME = 'cat_transparent.png'; // 现在的透明图片
+    const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
+    const STATIC_IMAGE = 'cat_static.png'; // 静止图
 
     let petElement;
+    let isAnimating = false; // 当前是否在播放动画
 
     if (USE_WEBM) {
         // 创建 Video 视频元素
         petElement = document.createElement('video');
         petElement.src = chrome.runtime.getURL(WEBM_FILENAME);
-        petElement.autoplay = true;
         petElement.loop = true;
         petElement.muted = true; // 浏览器策略：静音才能自动播放
         petElement.playsInline = true;
+        petElement.pause(); // 初始静止
     } else {
-        // 创建 Img 图片元素 (当前使用)
+        // 创建 Img 图片元素 (默认显示静止图)
         petElement = document.createElement('img');
-        petElement.src = chrome.runtime.getURL(IMAGE_FILENAME);
+        petElement.src = chrome.runtime.getURL(STATIC_IMAGE);
     }
 
     petElement.id = 'floating-pet-media';
@@ -73,27 +75,53 @@
     document.head.appendChild(style);
 
     // ==========================================
-    // 拖拽逻辑
+    // 拖拽与点击交互逻辑
     // ==========================================
     let isDragging = false;
     let initialX, initialY, currentX, currentY;
     let xOffset = 0, yOffset = 0;
+    
+    // 记录点击按下的起点，以此判断是“拖拽”还是“点击”
+    let clickStartX, clickStartY;
 
     petContainer.addEventListener('mousedown', dragStart);
     document.addEventListener('mouseup', dragEnd);
     document.addEventListener('mousemove', drag);
 
+    function toggleAnimation() {
+        if (USE_WEBM) {
+            if (petElement.paused) {
+                petElement.play();
+            } else {
+                petElement.pause();
+                petElement.currentTime = 0; // 重置到第一帧
+            }
+        } else {
+            isAnimating = !isAnimating;
+            petElement.src = chrome.runtime.getURL(isAnimating ? ANIMATED_IMAGE : STATIC_IMAGE);
+        }
+    }
+
     function dragStart(e) {
         if (e.target === petContainer || e.target === petElement) {
             initialX = e.clientX - xOffset;
             initialY = e.clientY - yOffset;
+            clickStartX = e.clientX;
+            clickStartY = e.clientY;
             isDragging = true;
             e.preventDefault(); // 阻止默认的文本/图片拖动行为
         }
     }
 
-    function dragEnd() {
+    function dragEnd(e) {
         if (!isDragging) return;
+        
+        // 判断鼠标松开时移动的距离。如果不超过 5 像素，算作是【点击】而不是拖拽
+        let moveDistance = Math.hypot(e.clientX - clickStartX, e.clientY - clickStartY);
+        if (moveDistance < 5) {
+            toggleAnimation();
+        }
+
         initialX = currentX;
         initialY = currentY;
         isDragging = false;
