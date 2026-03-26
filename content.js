@@ -88,18 +88,40 @@
     document.addEventListener('mouseup', dragEnd);
     document.addEventListener('mousemove', drag);
 
+    let animationTimer = null;
+
     function toggleAnimation() {
+        if (isAnimating) return; // 如果正在播放动画，忽略多余点击
+        
         if (USE_WEBM) {
-            if (petElement.paused) {
-                petElement.play();
-            } else {
+            petElement.currentTime = 0; // 重置到第一帧
+            petElement.play();
+            
+            clearTimeout(animationTimer);
+            animationTimer = setTimeout(() => {
                 petElement.pause();
-                petElement.currentTime = 0; // 重置到第一帧
-            }
+                petElement.currentTime = 0;
+            }, 5000);
         } else {
-            isAnimating = !isAnimating;
-            petElement.src = chrome.runtime.getURL(isAnimating ? ANIMATED_IMAGE : STATIC_IMAGE);
+            isAnimating = true;
+            let targetSrc = chrome.runtime.getURL(ANIMATED_IMAGE);
+            // APNG cache bypass to force animation restart
+            targetSrc += "?t=" + Date.now();
+            petElement.src = targetSrc;
+            
+            // 动画长度大约是 5 秒 (121帧 / 24fps)
+            clearTimeout(animationTimer);
+            animationTimer = setTimeout(() => {
+                isAnimating = false;
+                petElement.src = chrome.runtime.getURL(STATIC_IMAGE);
+            }, 5000);
         }
+        
+        // Add visual click feedback
+        petContainer.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0) scale(0.95)`;
+        setTimeout(() => {
+            petContainer.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0) scale(1)`;
+        }, 150);
     }
 
     function dragStart(e) {
@@ -116,14 +138,15 @@
     function dragEnd(e) {
         if (!isDragging) return;
         
-        // 判断鼠标松开时移动的距离。如果不超过 5 像素，算作是【点击】而不是拖拽
         let moveDistance = Math.hypot(e.clientX - clickStartX, e.clientY - clickStartY);
         if (moveDistance < 5) {
             toggleAnimation();
         }
 
-        initialX = currentX;
-        initialY = currentY;
+        // Prevent currentX/Y from becoming undefined if it was just a click
+        if (typeof currentX !== 'undefined') initialX = currentX;
+        if (typeof currentY !== 'undefined') initialY = currentY;
+        
         isDragging = false;
     }
 
