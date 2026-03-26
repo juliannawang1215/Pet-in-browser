@@ -15,7 +15,7 @@
     // 4. 去浏览器的扩展页面刷新一下这个插件即可！
     // ==========================================
     const USE_WEBM = true; 
-    const WEBM_FILES = ['you_video.webm', 'video2.webm']; 
+    const WEBM_FILES = ['video2.webm']; // 暂时只设置为新动作
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
     const STATIC_IMAGE = 'cat_static_hd.png'; // 高清静止图
 
