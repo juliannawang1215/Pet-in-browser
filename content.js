@@ -15,7 +15,10 @@
     // 4. 去浏览器的扩展页面刷新一下这个插件即可！
     // ==========================================
     const USE_WEBM = true; 
-    const WEBM_FILES = ['video2.webm']; // 暂时只设置为新动作
+    const WEBM_CONFIGS = [
+        { src: 'you_video.webm', scale: 1.0 },
+        { src: 'video2.webm', scale: 0.84 } // V2 is 9:16, 18% taller, scale down to match apparent size
+    ];
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
     const STATIC_IMAGE = 'cat_static_hd.png'; // 高清静止图
 
@@ -33,7 +36,7 @@
     if (USE_WEBM) {
         // 创建 Video 视频元素 (隐藏)
         animatedVideoElement = document.createElement('video');
-        animatedVideoElement.src = chrome.runtime.getURL(WEBM_FILES[0]);
+        animatedVideoElement.src = chrome.runtime.getURL(WEBM_CONFIGS[0].src);
         animatedVideoElement.loop = false;
         animatedVideoElement.muted = true;
         animatedVideoElement.playsInline = true;
@@ -114,8 +117,10 @@
         isAnimating = true;
         
         if (USE_WEBM) {
-            let randomWebm = WEBM_FILES[Math.floor(Math.random() * WEBM_FILES.length)];
-            animatedVideoElement.src = chrome.runtime.getURL(randomWebm);
+            let randomConfig = WEBM_CONFIGS[Math.floor(Math.random() * WEBM_CONFIGS.length)];
+            animatedVideoElement.src = chrome.runtime.getURL(randomConfig.src);
+            animatedVideoElement.style.transform = `scale(${randomConfig.scale})`;
+            animatedVideoElement.style.transformOrigin = 'bottom center';
             animatedVideoElement.load();
             staticImgElement.style.display = 'none';
             animatedVideoElement.style.display = 'block';
