@@ -14,8 +14,8 @@
     // 3. 把 "WEBM_FILENAME" 的值改为你的视频名字，比如 'dog.webm'
     // 4. 去浏览器的扩展页面刷新一下这个插件即可！
     // ==========================================
-    const USE_WEBM = false; 
-    const WEBM_FILENAME = 'your_video.webm'; 
+    const USE_WEBM = true; 
+    const WEBM_FILENAME = 'you_video.webm'; 
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
     const STATIC_IMAGE = 'cat_static.png'; // 静止图
 
@@ -26,10 +26,16 @@
         // 创建 Video 视频元素
         petElement = document.createElement('video');
         petElement.src = chrome.runtime.getURL(WEBM_FILENAME);
-        petElement.loop = true;
+        petElement.loop = false; // 不循环，播放完自动停
         petElement.muted = true; // 浏览器策略：静音才能自动播放
         petElement.playsInline = true;
-        petElement.pause(); // 初始静止
+        
+        // 监听播放结束事件，自动重置到静止状态
+        petElement.addEventListener('ended', () => {
+            petElement.currentTime = 0;
+            petElement.pause();
+            isAnimating = false;
+        });
     } else {
         // 创建 Img 图片元素 (默认显示静止图)
         petElement = document.createElement('img');
@@ -94,18 +100,12 @@
 
     function toggleAnimation() {
         if (isAnimating) return; // 如果正在播放动画，忽略多余点击
+        isAnimating = true;
         
         if (USE_WEBM) {
             petElement.currentTime = 0; // 重置到第一帧
             petElement.play();
-            
-            clearTimeout(animationTimer);
-            animationTimer = setTimeout(() => {
-                petElement.pause();
-                petElement.currentTime = 0;
-            }, 5000);
         } else {
-            isAnimating = true;
             let targetSrc = chrome.runtime.getURL(ANIMATED_IMAGE);
             // APNG cache bypass to force animation restart
             targetSrc += "?t=" + Date.now();
