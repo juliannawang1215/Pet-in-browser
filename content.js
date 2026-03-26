@@ -78,6 +78,8 @@
     // 拖拽与点击交互逻辑
     // ==========================================
     let isDragging = false;
+    let isDragReady = false; // Add variable for long press drag logic
+    let dragDelayTimer = null;
     let initialX, initialY, currentX, currentY;
     let xOffset = 0, yOffset = 0;
     
@@ -130,35 +132,52 @@
             initialY = e.clientY - yOffset;
             clickStartX = e.clientX;
             clickStartY = e.clientY;
-            isDragging = true;
             e.preventDefault(); // 阻止默认的文本/图片拖动行为
+            
+            // 启动长按检测计时器 (300ms 后才允许拖拽)
+            dragDelayTimer = setTimeout(() => {
+                isDragReady = true;
+                isDragging = true;
+                // 长按成功时的交互视觉反馈 (阴影加深)
+                petContainer.style.filter = "drop-shadow(0 25px 35px rgba(0,0,0,0.5))";
+            }, 300);
         }
     }
 
     function dragEnd(e) {
-        if (!isDragging) return;
+        // 松开鼠标时，先清除长按计时器
+        clearTimeout(dragDelayTimer);
         
-        let moveDistance = Math.hypot(e.clientX - clickStartX, e.clientY - clickStartY);
-        if (moveDistance < 5) {
-            toggleAnimation();
+        // 恢复视觉效果
+        petContainer.style.filter = "";
+        
+        if (!isDragReady) {
+            // 如果没达到长按时间 (300ms) 就松开了，说明这是一次点击！
+            // 为了防止点击时手抖滑动了鼠标，我们设定滑动位移 < 15 像素都算作点击
+            let moveDistance = Math.hypot(e.clientX - clickStartX, e.clientY - clickStartY);
+            if (moveDistance < 15) {
+                toggleAnimation();
+            }
+        } else {
+            // 这是真正的拖拽结束，保存最新位移状态
+            if (typeof currentX !== 'undefined') initialX = currentX;
+            if (typeof currentY !== 'undefined') initialY = currentY;
         }
 
-        // Prevent currentX/Y from becoming undefined if it was just a click
-        if (typeof currentX !== 'undefined') initialX = currentX;
-        if (typeof currentY !== 'undefined') initialY = currentY;
-        
+        isDragReady = false;
         isDragging = false;
     }
 
     function drag(e) {
-        if (isDragging) {
-            e.preventDefault();
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
-            xOffset = currentX;
-            yOffset = currentY;
-            setTranslate(currentX, currentY, petContainer);
-        }
+        // 如果长按还没准备好，或者没有处于拖拽状态，屏蔽鼠标移动事件
+        if (!isDragReady || !isDragging) return;
+        
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        xOffset = currentX;
+        yOffset = currentY;
+        setTranslate(currentX, currentY, petContainer);
     }
 
     function setTranslate(xPos, yPos, el) {
