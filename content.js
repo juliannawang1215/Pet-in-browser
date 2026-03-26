@@ -17,7 +17,8 @@
     const USE_WEBM = true; 
     const WEBM_CONFIGS = [
         { src: 'you_video.webm', scale: 1.0 },
-        { src: 'video2.webm', scale: 0.84 } // V2 is 9:16, 18% taller, scale down to match apparent size
+        { src: 'video2.webm', scale: 0.84 }, // V2 is 9:16, 18% taller, scale down to match apparent size
+        { src: 'video3.webm', scale: 1.0 } // Action 3
     ];
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
     const STATIC_IMAGE = 'cat_static_hd.png'; // 高清静止图
