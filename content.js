@@ -85,7 +85,6 @@
         #floating-pet-media {
             width: 100% !important;
             height: auto !important;
-            pointer-events: none !important; /* 避免挡住拖拽事件 */
             display: block; /* 被行内样式覆盖 */
             background: transparent !important;
         }
