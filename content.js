@@ -15,7 +15,7 @@
     // 4. 去浏览器的扩展页面刷新一下这个插件即可！
     // ==========================================
     const USE_WEBM = true; 
-    const WEBM_FILENAME = 'you_video.webm'; 
+    const WEBM_FILES = ['you_video.webm', 'video2.webm']; 
     const ANIMATED_IMAGE = 'cat_transparent.png'; // 动态图
     const STATIC_IMAGE = 'cat_static_hd.png'; // 高清静止图
 
@@ -33,7 +33,7 @@
     if (USE_WEBM) {
         // 创建 Video 视频元素 (隐藏)
         animatedVideoElement = document.createElement('video');
-        animatedVideoElement.src = chrome.runtime.getURL(WEBM_FILENAME);
+        animatedVideoElement.src = chrome.runtime.getURL(WEBM_FILES[0]);
         animatedVideoElement.loop = false;
         animatedVideoElement.muted = true;
         animatedVideoElement.playsInline = true;
@@ -114,6 +114,9 @@
         isAnimating = true;
         
         if (USE_WEBM) {
+            let randomWebm = WEBM_FILES[Math.floor(Math.random() * WEBM_FILES.length)];
+            animatedVideoElement.src = chrome.runtime.getURL(randomWebm);
+            animatedVideoElement.load();
             staticImgElement.style.display = 'none';
             animatedVideoElement.style.display = 'block';
             animatedVideoElement.currentTime = 0;
