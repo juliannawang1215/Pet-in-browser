@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cat Desktop Pet - Settings</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #111111;
+            --border-color: #e5e5e5;
+            --input-bg: #fafafa;
+            --button-bg: #000000;
+            --button-text: #ffffff;
+        }
+
+        body {
+            background: #f5f5f5; /* Subtle gray to show the rounded white panel */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 0;
+            padding: 12px; /* Outer spacing */
+            width: 380px;
+            box-sizing: border-box;
+            color: var(--text-color);
+        }
+
+        .settings-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 32px;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: left;
+            letter-spacing: -0.02em;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666;
+        }
+
+        input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 15px;
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.2s ease;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: #000;
+            background: #fff;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrapper span {
+            position: absolute;
+            left: 14px;
+            color: #999;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .input-icon-wrapper input {
+            padding-left: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: opacity 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="settings-container">
+        <h2>Salary Tracker</h2>
+        
+        <div class="form-group">
+            <label for="annualSalary">Annual Salary</label>
+            <div class="input-icon-wrapper">
+                <span>$</span>
+                <input type="number" id="annualSalary" placeholder="100000" min="0" step="1000">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="startTime">Work Start Time</label>
+            <input type="time" id="startTime" value="09:00">
+        </div>
+
+        <button id="saveBtn">Save Settings</button>
+        <div id="status">Settings saved.</div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>
