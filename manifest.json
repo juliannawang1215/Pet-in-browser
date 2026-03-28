@@ -3,7 +3,7 @@
     "name": "Desktop Pet - 小猫桌宠",
     "version": "1.1",
     "description": "让一只可爱的小猫在所有网页陪着你。",
-    "permissions": ["storage"],
+    "permissions": ["storage", "tabs"],
     "options_ui": {
         "page": "options.html",
         "open_in_tab": true
@@ -39,6 +39,7 @@
                 "cat_transparent.png",
                 "cat_static.png",
                 "cat_static_hd.png",
+                "cat_walk_strip.png",
                 "*.webm",
                 "*.mp4"
             ],
