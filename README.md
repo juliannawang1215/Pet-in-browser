@@ -4,6 +4,10 @@ A lightweight, interactive browser extension that brings a draggable cat pet to 
 
 ---
 
+
+https://github.com/user-attachments/assets/58c8fd2e-d177-436e-9bde-5ea274a752e4
+
+
 ## ✨ Features
 
 ### 😺 Interactive Desktop Pet
